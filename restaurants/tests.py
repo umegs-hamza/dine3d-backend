@@ -5,9 +5,7 @@ from accounts.models import User
 from restaurants.models import Restaurant
 
 
-class RestaurantListTests(APITestCase):
-    """Restaurants are list-only via the API (create/retrieve/update/destroy
-    are not exposed) — managed through Django Admin or the seed command instead."""
+class RestaurantAPITests(APITestCase):
 
     def setUp(self):
         self.owner_a = User.objects.create_user(email="ownera@example.com", password="StrongPass123")
@@ -35,23 +33,31 @@ class RestaurantListTests(APITestCase):
         response = self.client.get("/api/v1/restaurants/")
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    def test_create_endpoint_is_not_exposed(self):
+    def test_owner_can_create_restaurant_and_owner_is_set_from_authentication(self):
         self.client.force_authenticate(self.owner_a)
         response = self.client.post("/api/v1/restaurants/", {"name": "New Restaurant"})
-        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data["data"]["name"], "New Restaurant")
+        self.assertEqual(response.data["data"]["owner"], self.owner_a.id)
+        self.assertEqual(Restaurant.objects.get(name="New Restaurant").owner, self.owner_a)
 
-    def test_detail_endpoint_is_not_exposed(self):
+    def test_owner_can_retrieve_and_update_own_restaurant(self):
         self.client.force_authenticate(self.owner_b)
         response = self.client.get(f"/api/v1/restaurants/{self.restaurant_b.id}/")
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["data"]["name"], "Restaurant B")
 
-    def test_update_endpoint_is_not_exposed(self):
-        self.client.force_authenticate(self.owner_b)
         response = self.client.patch(f"/api/v1/restaurants/{self.restaurant_b.id}/", {"name": "Hacked"})
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["data"]["name"], "Hacked")
 
-    def test_delete_endpoint_is_not_exposed(self):
+    def test_owner_can_delete_own_restaurant(self):
         self.client.force_authenticate(self.owner_b)
         response = self.client.delete(f"/api/v1/restaurants/{self.restaurant_b.id}/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertFalse(Restaurant.objects.filter(pk=self.restaurant_b.id).exists())
+
+    def test_owner_cannot_access_another_owners_restaurant(self):
+        self.client.force_authenticate(self.owner_a)
+        response = self.client.get(f"/api/v1/restaurants/{self.restaurant_b.id}/")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertTrue(Restaurant.objects.filter(pk=self.restaurant_b.id).exists())
