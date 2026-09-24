@@ -30,10 +30,19 @@ class Product3DModelSerializer(serializers.ModelSerializer):
 
 
 class Product3DModelPublicSerializer(serializers.ModelSerializer):
+    model_url = serializers.SerializerMethodField()
+
     class Meta:
         model = Product3DModel
         fields = ["model_url", "format", "is_ar_enabled"]
         read_only_fields = fields
+
+    def get_model_url(self, obj):
+        # An uploaded file takes priority over a pasted URL, mirroring how
+        # the owner-facing form lets an admin pick either.
+        if obj.model_file:
+            return obj.model_file.url
+        return obj.model_url
 
 
 def _owned_restaurants_queryset(request):
