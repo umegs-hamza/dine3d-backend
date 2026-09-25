@@ -5,7 +5,7 @@ from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
 from admin_api.views import AdminDashboardView
-from menu.views import Product3DModelView, PublicRestaurantMenuView
+from menu.views import Product3DModelView, PublicRestaurantListView, PublicRestaurantMenuView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -18,6 +18,11 @@ urlpatterns = [
         "api/v1/products/<int:product_id>/3d/",
         Product3DModelView.as_view(),
         name="product-3d-model",
+    ),
+    path(
+        "api/v1/public/restaurants/",
+        PublicRestaurantListView.as_view(),
+        name="public-restaurant-list",
     ),
     path(
         "api/v1/public/restaurants/<slug:slug>/",

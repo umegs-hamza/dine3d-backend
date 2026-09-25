@@ -92,12 +92,12 @@ if env_bool("USE_SQLITE", False):
 else:
     DATABASES = {
         "default": {
-            "ENGINE": "django.db.backends.postgresql",
+            "ENGINE": "django.db.backends.mysql",
             "NAME": os.getenv("DATABASE_NAME", "restaurant_db"),
-            "USER": os.getenv("DATABASE_USER", "postgres"),
-            "PASSWORD": os.getenv("DATABASE_PASSWORD", "postgres"),
+            "USER": os.getenv("DATABASE_USER", "root"),
+            "PASSWORD": os.getenv("DATABASE_PASSWORD", "Root"),
             "HOST": os.getenv("DATABASE_HOST", "localhost"),
-            "PORT": os.getenv("DATABASE_PORT", "5432"),
+            "PORT": os.getenv("DATABASE_PORT", "3306"),
         }
     }
 

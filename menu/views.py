@@ -151,6 +151,20 @@ class Product3DModelView(APIView):
         return success_response(message="3D model deleted successfully.")
 
 
+class PublicRestaurantListView(APIView):
+    """Public, unauthenticated listing of every published + active restaurant.
+    Returns light restaurant cards only (no menus) — the menu is fetched per
+    restaurant via PublicRestaurantMenuView."""
+
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        from restaurants.serializers import RestaurantPublicSerializer
+
+        restaurants = Restaurant.objects.filter(is_published=True, is_active=True).order_by("name")
+        return success_response(data=RestaurantPublicSerializer(restaurants, many=True).data)
+
+
 class PublicRestaurantMenuView(APIView):
     """Public, unauthenticated endpoint returning a published restaurant's full
     menu: only active categories and available products are included."""
