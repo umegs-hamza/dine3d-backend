@@ -7,6 +7,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 import os
+import environ
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
