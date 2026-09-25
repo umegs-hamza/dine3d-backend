@@ -28,6 +28,7 @@ def env_list(key, default=""):
 SECRET_KEY = os.getenv("SECRET_KEY", "insecure-dev-key-change-me")
 DEBUG = env_bool("DEBUG", False)
 ALLOWED_HOSTS = env_list("ALLOWED_HOSTS", "localhost,127.0.0.1")
+env = environ.Env()
 
 INSTALLED_APPS = [
     "django.contrib.admin",
