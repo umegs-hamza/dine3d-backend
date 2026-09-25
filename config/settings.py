@@ -12,6 +12,10 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 load_dotenv(BASE_DIR / ".env")
+env = environ.Env(
+    DEBUG=(bool, False)
+)
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 
 def env_bool(key, default=False):
@@ -85,8 +89,9 @@ ASGI_APPLICATION = "config.asgi.application"
 # PostgreSQL is the intended production database (see README). USE_SQLITE is a
 # local-only escape hatch for developing without a configured Postgres server.
 DATABASES = {
-    "default": os.getenv("DATABASE_URL", default="sqlite:///db.sqlite3")
+    "default": env.db("DATABASE_URL", default="sqlite:///db.sqlite3")
 }
+
 
 AUTH_USER_MODEL = "accounts.User"
 
