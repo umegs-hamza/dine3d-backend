@@ -82,24 +82,9 @@ ASGI_APPLICATION = "config.asgi.application"
 
 # PostgreSQL is the intended production database (see README). USE_SQLITE is a
 # local-only escape hatch for developing without a configured Postgres server.
-if env_bool("USE_SQLITE", False):
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
-        }
-    }
-else:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.mysql",
-            "NAME": os.getenv("DATABASE_NAME", "restaurant_db"),
-            "USER": os.getenv("DATABASE_USER", "root"),
-            "PASSWORD": os.getenv("DATABASE_PASSWORD", "Root"),
-            "HOST": os.getenv("DATABASE_HOST", "localhost"),
-            "PORT": os.getenv("DATABASE_PORT", "3306"),
-        }
-    }
+DATABASES = {
+    "default": env.db("DATABASE_URL", default="sqlite:///db.sqlite3")
+}
 
 AUTH_USER_MODEL = "accounts.User"
 
