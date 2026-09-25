@@ -4,10 +4,10 @@ Django settings for the restaurant digital menu platform backend.
 
 from datetime import timedelta
 from pathlib import Path
-
+import environ
 from dotenv import load_dotenv
 import os
-import environ
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -29,7 +29,7 @@ def env_list(key, default=""):
 SECRET_KEY = os.getenv("SECRET_KEY", "insecure-dev-key-change-me")
 DEBUG = env_bool("DEBUG", False)
 ALLOWED_HOSTS = env_list("ALLOWED_HOSTS", "localhost,127.0.0.1")
-env = environ.Env()
+
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -85,7 +85,7 @@ ASGI_APPLICATION = "config.asgi.application"
 # PostgreSQL is the intended production database (see README). USE_SQLITE is a
 # local-only escape hatch for developing without a configured Postgres server.
 DATABASES = {
-    "default": env.db("DATABASE_URL", default="sqlite:///db.sqlite3")
+    "default": os.getenv("DATABASE_URL", default="sqlite:///db.sqlite3")
 }
 
 AUTH_USER_MODEL = "accounts.User"
