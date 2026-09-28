@@ -88,8 +88,12 @@ ASGI_APPLICATION = "config.asgi.application"
 
 # PostgreSQL is the intended production database (see README). USE_SQLITE is a
 # local-only escape hatch for developing without a configured Postgres server.
+# The default must be an absolute path — a relative "sqlite:///db.sqlite3"
+# resolves against the process's current working directory, not BASE_DIR, so
+# starting the server from a different cwd would silently open (or create) an
+# unrelated, empty database file.
 DATABASES = {
-    "default": env.db("DATABASE_URL", default="sqlite:///db.sqlite3")
+    "default": env.db("DATABASE_URL", default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}")
 }
 
 
