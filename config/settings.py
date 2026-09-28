@@ -199,6 +199,13 @@ CORS_ALLOWED_ORIGINS = env_list(
 )
 CORS_ALLOW_CREDENTIALS = True
 
+if DEBUG:
+    # Vite picks the next free port (5177, 5178, ...) whenever a configured
+    # one is already in use, which would otherwise silently break every API
+    # call with a CORS error. Only matters in local dev — production still
+    # relies on the explicit allowlist above.
+    CORS_ALLOWED_ORIGIN_REGEXES = [r"^https?://(localhost|127\.0\.0\.1):\d+$"]
+
 # ---------------------------------------------------------------------------
 # Upload limits (used by validators in menu/restaurants apps)
 # ---------------------------------------------------------------------------
