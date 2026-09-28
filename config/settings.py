@@ -129,12 +129,22 @@ if USE_GCS:
     GS_BUCKET_NAME = os.getenv("GS_BUCKET_NAME")
     GS_PROJECT_ID = os.getenv("GS_PROJECT_ID")
     GS_CREDENTIALS_FILE = os.getenv("GS_CREDENTIALS_FILE")
+    GS_CREDENTIALS_JSON_B64 = os.getenv("GS_CREDENTIALS_JSON_B64")
     GS_DEFAULT_ACL = None  # bucket uses uniform bucket-level access
     GS_FILE_OVERWRITE = False
     GS_QUERYSTRING_AUTH = env_bool("GS_QUERYSTRING_AUTH", False)
     GS_EXPIRATION = timedelta(hours=1)
 
-    if GS_CREDENTIALS_FILE:
+    if GS_CREDENTIALS_JSON_B64:
+        import base64
+        import json
+
+        from google.oauth2 import service_account
+
+        GS_CREDENTIALS = service_account.Credentials.from_service_account_info(
+            json.loads(base64.b64decode(GS_CREDENTIALS_JSON_B64))
+        )
+    elif GS_CREDENTIALS_FILE:
         from google.oauth2 import service_account
 
         GS_CREDENTIALS = service_account.Credentials.from_service_account_file(GS_CREDENTIALS_FILE)
