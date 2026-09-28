@@ -196,7 +196,9 @@ SPECTACULAR_SETTINGS = {
 # CORS
 # ---------------------------------------------------------------------------
 CORS_ALLOWED_ORIGINS = env_list(
-    "CORS_ALLOWED_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173"
+    "CORS_ALLOWED_ORIGINS",
+    "http://localhost:5173,http://127.0.0.1:5173,"
+    "https://admin.dine3d.com,https://dine3d.com",
 )
 CORS_ALLOW_CREDENTIALS = True
 
@@ -212,7 +214,9 @@ if DEBUG:
 # separately from CORS_ALLOWED_ORIGINS above. Without the deployed domain
 # here, every POST (e.g. the Django admin login form) fails with "CSRF
 # verification failed: Origin checking failed".
-CSRF_TRUSTED_ORIGINS = env_list("CSRF_TRUSTED_ORIGINS", "")
+CSRF_TRUSTED_ORIGINS = env_list(
+    "CSRF_TRUSTED_ORIGINS", "https://backend.dine3d.com,https://admin.dine3d.com"
+)
 
 # CapRover's proxy terminates HTTPS and forwards plain HTTP to the container,
 # so Django would otherwise think every request is insecure — breaking the
