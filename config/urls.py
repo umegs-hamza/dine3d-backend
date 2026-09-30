@@ -1,7 +1,8 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import include, path
+from django.urls import include, path, re_path
+from django.views.static import serve
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
 from admin_api.views import AdminDashboardView
@@ -36,3 +37,22 @@ urlpatterns = [
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+elif not settings.USE_GCS:
+    # Django's static() helper (above) refuses to serve anything outside
+    # DEBUG, and there is no nginx/reverse-proxy in front of gunicorn here
+    # (see the backend Dockerfile) to serve MEDIA_ROOT some other way. With
+    # USE_GCS off, uploaded images and 3D model files are stored on local
+    # disk, so without this route every uploaded file 404s in production —
+    # which is exactly why AR (fetching an uploaded .glb by URL) silently
+    # failed to load anything. Wiring django.views.static.serve directly
+    # bypasses that DEBUG guard; it's not as fast as a dedicated static file
+    # server, but this app's media traffic doesn't need one, and it's far
+    # better than uploads being unreachable outright. Switching USE_GCS=True
+    # remains the more scalable option.
+    urlpatterns += [
+        re_path(
+            rf"^{settings.MEDIA_URL.lstrip('/')}(?P<path>.*)$",
+            serve,
+            {"document_root": settings.MEDIA_ROOT},
+        ),
+    ]
